@@ -122,7 +122,19 @@ const forensicsPanel=function(){
  const rows=f.observed.map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+esc(x.foreground||'unknown')+'</td><td>'+esc(x.stroke??'unknown')+'</td><td>'+esc(x.tile)+'</td><td>'+esc(x.gradient.join(' → ')||'none')+'</td></tr>').join('');
  return '<div class="pane"><h3>Measured design evidence</h3><p class="sub">'+f.svgCount+' SVGs reviewed · '+f.proposed.length+' provisional rules · missing values remain unknown.</p><details open><summary>Inspect each reference</summary><div style="overflow-x:auto"><table style="width:100%;text-align:left;border-spacing:10px"><thead><tr><th>Reference</th><th>Foreground</th><th>Stroke</th><th>Background</th><th>Gradient colors</th></tr></thead><tbody>'+rows+'</tbody></table></div></details><p class="sub tiny">This is measured SVG structure and cautious role inference, not confirmed designer intent or full semantic style extraction.</p></div>';
 };
-viewDNA=function(){return originalDNA().replace('<div class="design-layout">',forensicsPanel()+'<div class="design-layout">');};
+function forensicSpecimen(){
+ const names=['star','heart','book','compare','branch','evidence'];
+ const current=activeStyle();
+ return '<section class="specimen" aria-label="Live generated specimen from provisional Style DNA"><div class="specimen-header"><div><div class="eyebrow">Derived specimen · provisional</div><h3>What the extracted rules produce</h3></div><span class="chip unknown">Not a fidelity guarantee</span></div><div class="specimen-grid">'+names.map(c=>'<div class="specimen-cell"><img alt="'+esc(c)+' built from current rules" src="'+svgImg(iconSVG(c,'balanced',current))+'"></div>').join('')+'</div><p class="specimen-caption">This is a controlled vector reconstruction, not a copy of your source icons. Compare its background, strokes, proportions, and filled/outlined treatments against the imported references.</p></section>';
+}
+viewDNA=function(){
+ let out=originalDNA();
+ const rules='<div class="pane"><div class="row between"><h3>Design rules</h3>';
+ const grammar='<div class="pane"><h3>Optional symbolic grammar</h3>';
+ if(out.includes(rules)) out=out.replace(rules,forensicSpecimen()+rules);
+ if(out.includes(grammar)) out=out.replace(grammar,forensicsPanel()+grammar);
+ return out;
+};
 viewReferences=function(){return originalRefs().replace('<div class="pane"><h3>Evidence boundary</h3>',forensicsPanel()+'<div class="pane"><h3>Evidence boundary</h3>');};
 render();
 })();
